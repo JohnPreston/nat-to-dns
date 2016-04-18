@@ -1,0 +1,6 @@
+# - play to update the HAProxy as ELB Eucalyptus gonna change
+
+- hosts: localhost
+  connection: local
+  roles:
+  - haproxyconfig

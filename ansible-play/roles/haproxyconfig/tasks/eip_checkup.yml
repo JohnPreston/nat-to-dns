@@ -1,0 +1,67 @@
+#
+# EIP checkup and assignement
+#
+
+- name: Who am I
+  shell: head -1 /var/tmp/whoami.conf
+  register: whoiam
+
+- name: Debug who I am
+  debug: msg="Jason Bourne is {{ whoiam.stdout }}"
+
+- name: Get the bucketname
+  shell: head -1 /var/tmp/bucketname.conf | awk -F. '{print $1}'
+  register: bucket_name
+
+- name: Debug the bucket name
+  debug: msg="{{ bucket_name.stdout }}"
+
+- name: Get the EIP config to apply
+  s3: bucket="{{ bucket_name.stdout }}" object="{{ whoiam.stdout }}.conf" dest="/var/tmp/eip.conf" mode=get s3_url="{{ s3_url }}"
+
+- name: Get the EIP from the local file config
+  shell: cat /var/tmp/eip.conf
+  register: eips_dedicated
+
+- name: Debug local EIP from file
+  debug: msg={{ item }}
+  with_items:
+  - "{{ eips_dedicated.stdout_lines }}"
+
+- name: Debug Instance meta-data public-ipv4
+  debug: msg="{{ ansible_ec2_public_ipv4 }}"
+
+- name: Checks if the public-ipv4 matches IPs in the list
+  fail: msg="{{ ansible_ec2_public_ipv4 }} not in the list"
+  when:
+  - ansible_ec2_public_ipv4 not in eips_dedicated.stdout_lines
+  register: eip_present
+  ignore_errors: true
+
+- name: Pick an EIP
+  shell: echo {{item }}
+  register: the_eip
+  with_items:
+  - "{{ eips_dedicated.stdout_lines|random }}"
+  when:
+  - eip_present|failed
+
+- name: Debug the eip
+  debug: msg="{{ the_eip.results }}"
+
+- name: Check if EIP is used
+  shell: ping -c 100 -f {{ item['stdout'] }}
+  register: eip_reachable
+  with_items:
+  - "{{ the_eip.results }}"
+  when:
+  - eip_present|failed
+  ignore_errors: true
+
+- name: EIP assignment
+  ec2_eip: public_ip="{{ item.stdout }}" instance_id="{{ ansible_ec2_instance_id }}"  ec2_url="{{ ec2_url }}"
+  with_items:
+  - "{{ the_eip.results }}"
+  when:
+  - eip_present|failed
+  - eip_reachable|failed

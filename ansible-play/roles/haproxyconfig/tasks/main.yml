@@ -1,0 +1,20 @@
+# -
+
+- name: Install required packages
+  yum: name=python-netaddr state=latest
+
+- name: Fetch new data
+  setup:
+
+- name: Get the instance EC2 info
+  action: ec2_facts
+  register: ec2_data
+
+- name: Check on EIP
+  include: eip_checkup.yml
+
+- name: Configure HAProxy
+  include: elb_haproxy.yml
+
+- name: Add cronjob
+  cron: name=auto-update-elb month=* day=* hour=*  minute=*/1 job="/bin/bash /var/tmp/MyELBtoDNS/ansible-play/roles/haproxyconfig/scripts/ansible_script.sh"
