@@ -1,11 +1,17 @@
 # - play to update the HAProxy as ELB Eucalyptus gonna change
 
-- name: Download the latest git repo
-  git: clone=yes dest=/var/tmp/nat-to-dns repo=http://github.com/johnpreston/nat-to-dns update=yes force=yes
+- hosts:
+  - localhost
+  tasks:
 
+  - name: Remove existing
+    shell: file /etc/ansible/roles/nat-stack-init || rm -rfv /etc/ansible/roles/nat-stack-init
+    ignore_errors: true
 
+  - name: Download the latest git version of the NAT
+    git: clone=yes repo=https://github.com/johnpreston/nat-stack-init update=yes force=yes version="{{ nat_version }}" dest=/etc/ansible/roles/nat-stack-init
 
-#- hosts: localhost
-#  connection: local
-#  roles:
-#  - init-stack
+- hosts:
+  - localhost
+  roles:
+  - nat-stack-init
