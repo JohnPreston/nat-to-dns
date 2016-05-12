@@ -12,4 +12,4 @@
     git: clone=yes repo=https://github.com/johnpreston/nat-stack-init update=yes force=yes version="{{ init_nat_version }}" dest=/etc/ansible/roles/nat-stack-init
 
   - name: Download the latest git version of nat-deploy
-    git: clone=yes repo=https://github.com/johnpreston/nat-stack-init update=yes force=yes version="{{ deplpy_nat_version }}" dest=/etc/ansible/roles/nat-stack-deploy
+    git: clone=yes repo=https://github.com/johnpreston/nat-stack-init update=yes force=yes version="{{ deploy_nat_version }}" dest=/etc/ansible/roles/nat-stack-deploy

@@ -236,7 +236,7 @@
                 "owner": "root",
                 "group": "root"
               },
-              "/var/tmp/init_version.conf": {
+              "/var/tmp/init_nat_version.conf": {
                 "content": {
                   "Fn::Join": [
                     "",
@@ -249,7 +249,7 @@
                 "owner": "root",
                 "group": "root"
               },
-              "/var/tmp/deploy_version.conf": {
+              "/var/tmp/deploy_nat_version.conf": {
                 "content": {
                   "Fn::Join": [
                     "",
