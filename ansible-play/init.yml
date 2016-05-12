@@ -1,6 +1,11 @@
 # - play to update the HAProxy as ELB Eucalyptus gonna change
 
-- hosts: localhost
-  connection: local
-  roles:
-  - init-stack
+- name: Download the latest git repo
+  git: clone=yes dest=/var/tmp/nat-to-dns repo=http://github.com/johnpreston/nat-to-dns update=yes force=yes
+
+
+
+#- hosts: localhost
+#  connection: local
+#  roles:
+#  - init-stack
