@@ -236,7 +236,20 @@
                 "owner": "root",
                 "group": "root"
               },
-              "/var/tmp/version.conf": {
+              "/var/tmp/init_version.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "master\n"
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/deploy_version.conf": {
                 "content": {
                   "Fn::Join": [
                     "",
@@ -285,7 +298,7 @@
                 "command": "yum install python-netaddr -y"
               },
               "0005-RunAnsibleInit": {
-                "command": "git clone https://github.com/johnpreston/nat-to-dns /var/tmp/nat-to-dns; cd /var/tmp/nat-to-dns ; ansible-playbook /var/tmp/nat-to-dns/ansible-play/init.yml -e nat_version=`head -1 /var/tmp/version.conf`"
+                "command": "git clone https://github.com/johnpreston/nat-to-dns /var/tmp/nat-to-dns; cd /var/tmp/nat-to-dns ; ansible-playbook /var/tmp/nat-to-dns/ansible-play/init.yml -e init_nat_version=`head -1 /var/tmp/init_version.conf` deploy_nat_version=`head -1 /var/tmp/deploy_nat_version.conf`"
               },
               "0006-RunAnsibleInitStack": {
                 "command": "ansible-playbook /var/tmp/nat-to-dns/ansible-play/init-stack.yml -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf` -e stackname=`head -1 /var/tmp/stackname.conf`",
