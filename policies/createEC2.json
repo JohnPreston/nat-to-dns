@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "ec2:DescribeImages",
+      "Resource": "*",
+      "Effect": "Allow"
+    },
+    {
+      "Action": "ec2:RunInstances",
+      "Resource": "*",
+      "Effect": "Allow"
+    },
+    {
+      "Action": "ec2:TerminateInstances",
+      "Resource": "*",
+      "Effect": "Allow"
+    }
+  ]
+}

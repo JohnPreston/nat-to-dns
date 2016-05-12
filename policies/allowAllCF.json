@@ -1,0 +1,11 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "cloudformation:*",
+      "Resource": "*",
+      "Effect": "Allow",
+      "Sid": "Stmt1460983341048"
+    }
+  ]
+}
