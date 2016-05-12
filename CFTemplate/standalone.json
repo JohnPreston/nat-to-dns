@@ -37,11 +37,6 @@
       "Default": "8773",
       "ConstraintDescription": "must be a valid EC2 instance type."
     },
-    "WebServerPort": {
-      "Description": "TCP/IP port of the web server",
-      "Type": "String",
-      "Default": "443"
-    },
     "SSHServerPort": {
       "Description": "TCP/IP port of the web server",
       "Type": "String",
@@ -236,6 +231,22 @@
                 "owner": "root",
                 "group": "root"
               },
+              "/var/tmp/admin_port.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "",
+                      {
+                        "Ref": "SSHServerPort"
+                      }
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
               "/var/tmp/init_nat_version.conf": {
                 "content": {
                   "Fn::Join": [
@@ -421,16 +432,6 @@
             "CidrIp": {
               "Ref": "SSHLocation"
             }
-          },
-          {
-            "IpProtocol": "tcp",
-            "FromPort": {
-              "Ref": "WebServerPort"
-            },
-            "ToPort": {
-              "Ref": "WebServerPort"
-            },
-            "CidrIp": "0.0.0.0/0"
           }
         ]
       }
@@ -478,10 +479,25 @@
         "Path": "/",
         "Policies": [
           {
-            "PolicyName": "root",
+            "PolicyName": "handle-nat",
             "PolicyDocument": {
               "Version": "2012-10-17",
               "Statement": [
+                {
+                  "Action": "ec2:AuthorizeSecurityGroupIngress",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "ec2:DescribeSecurityGroups",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "ec2:RevokeSecurityGroupIngress",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
                 {
                   "Action": "ec2:AssociateAddress",
                   "Resource": "*",
