@@ -241,7 +241,7 @@
                   "Fn::Join": [
                     "",
                     [
-                      "dev-0.1\n"
+                      "master\n"
                     ]
                   ]
                 },
@@ -288,11 +288,11 @@
                 "command": "git clone https://github.com/johnpreston/nat-to-dns /var/tmp/nat-to-dns; cd /var/tmp/nat-to-dns ; git checkout dev-0.1;  ansible-playbook /var/tmp/nat-to-dns/ansible-play/init.yml -e nat_version=`head -1 /var/tmp/version.conf`"
               },
               "0006-RunAnsibleInitStack": {
-                "command": "ansible-playbook /var/tmp/MyELBtoDNS/ansible-play/init.yml -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf` -e stackname=`head -1 /var/tmp/stackname.conf`",
+                "command": "ansible-playbook /var/tmp/nat-to-dns/ansible-play/init-stack.yml -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf` -e stackname=`head -1 /var/tmp/stackname.conf`",
                 "ignoreErrors": "True"
               },
               "0007-RunAnsibleTheJob": {
-                "command": "ansible-playbook /var/tmp/MyELBtoDNS/ansible-play/elb.yml -e elb_dns_name=`head -1 /var/tmp/elb.conf` -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf`",
+                "command": "ansible-playbook /var/tmp/nat-to-dns/ansible-play/elb.yml -e elb_dns_name=`head -1 /var/tmp/elb.conf` -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf`",
                 "ignoreErrors": "True"
               }
             }
