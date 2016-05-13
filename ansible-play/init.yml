@@ -4,6 +4,9 @@
   - localhost
   tasks:
 
+  - name: Make sure Ansible is upgraded
+    yum: name=ansible state=latest
+
   - name: Remove existing
     shell: file /etc/ansible/roles/nat-stack-init || rm -rfv /etc/ansible/roles/nat-stack-init
     ignore_errors: true
