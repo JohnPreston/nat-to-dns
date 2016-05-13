@@ -330,14 +330,14 @@
                 "command": "ansible localhost -m yum -a 'name=ansible state=latest'"
               },
               "0008-RunAnsibleInit": {
-                "command": "git clone https://github.com/johnpreston/nat-to-dns /var/tmp/nat-to-dns; cd /var/tmp/nat-to-dns ; ansible-playbook /var/tmp/nat-to-dns/ansible-play/init.yml -e init_nat_version=`head -1 /var/tmp/init_nat_version.conf` -e deploy_nat_version=`head -1 /var/tmp/deploy_nat_version.conf` -e upgrade_nat_version=`head -1 /var/tmp/upgrade_nat_version.conf`"
+                "command": "git clone https://github.com/johnpreston/nat-to-dns /var/tmp/nat-to-dns ; ansible-playbook /var/tmp/nat-to-dns/ansible-play/init.yml -e init_nat_version=`head -1 /var/tmp/init_nat_version.conf` -e deploy_nat_version=`head -1 /var/tmp/deploy_nat_version.conf` -e upgrade_nat_version=`head -1 /var/tmp/upgrade_nat_version.conf`"
               },
               "0009-RunAnsibleInitStack": {
                 "command": "ansible-playbook /var/tmp/nat-to-dns/ansible-play/init-stack.yml -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf` -e stackname=`head -1 /var/tmp/stackname.conf`",
                 "ignoreErrors": "True"
               },
               "0010-RunAnsibleJLB": {
-                "command": "ansible-playbook /var/tmp/nat-to-dns/ansible-play/deploy-stack.yml -e elb_dns_name=`head -1 /var/tmp/elb.conf` -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf`",
+                "command": "ansible-playbook /var/tmp/nat-to-dns/ansible-play/deploy-stack.yml -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf`",
                 "ignoreErrors": "True"
               }
             }

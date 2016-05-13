@@ -55,7 +55,7 @@
       "Type": "Number",
       "MinValue": 21,
       "MaxValue": 65535,
-      "Default": 8773,
+      "Default": 2223,
       "ConstraintDescription": "must be a valid port Number"
     },
     "KeyName": {
