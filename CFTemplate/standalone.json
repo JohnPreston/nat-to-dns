@@ -85,6 +85,14 @@
       "AllowedPattern": "emi-[\\x20-\\x7E]*",
       "ConstraintDescription": "can contain only ASCII characters."
     },
+    "BucketName": {
+      "Description": "Name of the bucket to be used",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "255",
+      "AllowedPattern": "[\\x20-\\x7E]*",
+      "ConstraintDescription": "can contain only ASCII characters."
+    },
     "RegionDNS": {
       "Description": "The region DNS zone (ie: eu-west-1.amazonaws.com)",
       "Type": "String",
@@ -103,18 +111,7 @@
     }
   },
   "Resources": {
-    "s3EIPBucket": {
-      "Type": "AWS::S3::Bucket",
-      "Properties": {
-        "AccessControl": "BucketOwnerFullControl",
-        "BucketName": {
-          "Ref": "AWS::StackName"
-        }
-      },
-      "DeletionPolicy": "Delete"
-    },
     "ec2Mgmt": {
-      "DependsOn": "s3EIPBucket",
       "Metadata": {
         "AWS::CloudFormation::Init": {
           "config": {
@@ -165,7 +162,7 @@
                     "",
                     [
                       {
-                        "Ref": "AWS::StackName"
+                        "Ref": "BucketName"
                       },
                       "\n"
                     ]
@@ -584,22 +581,6 @@
     }
   },
   "Outputs": {
-    "BucketURL": {
-      "Description": "URL of the bucket with all IP informations",
-      "Value": {
-        "Fn::Join": [
-          "",
-          [
-            {
-              "Fn::GetAtt": [
-                "s3EIPBucket",
-                "DomainName"
-              ]
-            }
-          ]
-        ]
-      }
-    },
     "SecurityGroup": {
       "Description": "SecurityGroup ID of the NAT system",
       "Value": {
