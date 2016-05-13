@@ -128,7 +128,15 @@
                     "",
                     [
                       {
+                        "Ref": "SrcPort"
+                      },
+                      ":",
+                      {
                         "Ref": "DestTarget"
+                      },
+                      ":",
+                      {
+                        "Ref": "DestPort"
                       },
                       "\n"
                     ]
