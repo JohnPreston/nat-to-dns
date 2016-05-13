@@ -8,6 +8,20 @@
       "MinLength": "8",
       "MaxLength": "256"
     },
+    "DestPort": {
+      "Description": "The DNS Name of the target to monitor",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "5",
+      "Default": "443"
+    },
+    "SrcPort": {
+      "Description": "The DNS Name of the target to monitor",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "5",
+      "Default": "443"
+    },
     "InstanceType": {
       "Description": "WebServer EC2 instance type",
       "Type": "String",
@@ -108,7 +122,7 @@
         "AWS::CloudFormation::Init": {
           "config": {
             "files": {
-              "/var/tmp/elb.conf": {
+              "/var/tmp/target.conf": {
                 "content": {
                   "Fn::Join": [
                     "",
@@ -124,55 +138,7 @@
                 "owner": "root",
                 "group": "root"
               },
-              "/var/tmp/ec2.conf": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Ref": "APIProtocol"
-                      },
-                      "compute.",
-                      {
-                        "Ref": "RegionDNS"
-                      },
-                      ":",
-                      {
-                        "Ref": "APIPort"
-                      },
-                      "\n"
-                    ]
-                  ]
-                },
-                "mode": "000600",
-                "owner": "root",
-                "group": "root"
-              },
-              "/var/tmp/s3.conf": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Ref": "APIProtocol"
-                      },
-                      "s3.",
-                      {
-                        "Ref": "RegionDNS"
-                      },
-                      ":",
-                      {
-                        "Ref": "APIPort"
-                      },
-                      "\n"
-                    ]
-                  ]
-                },
-                "mode": "000600",
-                "owner": "root",
-                "group": "root"
-              },
-              "/var/tmp/bucketname.conf": {
+              "/var/tmp/stackname.conf": {
                 "content": {
                   "Fn::Join": [
                     "",
@@ -188,7 +154,7 @@
                 "owner": "root",
                 "group": "root"
               },
-              "/var/tmp/stackname.conf": {
+              "/var/tmp/bucketname.conf": {
                 "content": {
                   "Fn::Join": [
                     "",
@@ -233,6 +199,24 @@
                 "owner": "root",
                 "group": "root"
               },
+              "/var/tmp/security_group.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "sgPreELBGroup",
+                          "GroupId"
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
               "/var/tmp/init_nat_version.conf": {
                 "content": {
                   "Fn::Join": [
@@ -259,17 +243,47 @@
                 "owner": "root",
                 "group": "root"
               },
-              "/var/tmp/securityGroup.conf": {
+              "/var/tmp/s3.conf": {
                 "content": {
                   "Fn::Join": [
                     "",
                     [
                       {
-                        "Fn::GetAtt": [
-                          "sgPreELBGroup",
-                          "GroupId"
-                        ]
-                      }
+                        "Ref": "APIProtocol"
+                      },
+                      "s3.",
+                      {
+                        "Ref": "RegionDNS"
+                      },
+                      ":",
+                      {
+                        "Ref": "APIPort"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/ec2.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "APIProtocol"
+                      },
+                      "compute.",
+                      {
+                        "Ref": "RegionDNS"
+                      },
+                      ":",
+                      {
+                        "Ref": "APIPort"
+                      },
+                      "\n"
                     ]
                   ]
                 },
