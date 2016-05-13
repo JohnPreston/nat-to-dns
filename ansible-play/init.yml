@@ -4,13 +4,6 @@
   - localhost
   tasks:
 
-  - name: Make sure Ansible is upgraded
-    yum: name=ansible state=latest
-
-- hosts:
-  - localhost
-  tasks:
-
   - name: Download the latest version of init-stack
     git: repo=https://github.com/johnpreston/nat-stack-init clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-init version="{{ init_nat_version }}"
 
