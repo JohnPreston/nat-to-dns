@@ -12,25 +12,10 @@
   tasks:
 
   - name: Download the latest version of init-stack
-    git: clone=yes
-         repo=https://github.com/johnpreston/nat-stack-init
-         update=yes
-         force=yes
-         dest=/etc/ansible/roles/nat-stack-init
-         version="{{ init_nat_version }}"
+    git: repo=https://github.com/johnpreston/nat-stack-init clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-init version="{{ init_nat_version }}"
 
   - name: Download the latest git version of nat-deploy
-    git: clone=yes
-         repo=https://github.com/johnpreston/nat-stack-deploy
-         update=yes
-         force=yes
-         dest=/etc/ansible/roles/nat-stack-deploy
-         version="{{ deploy_nat_version }}"
+    git: repo=https://github.com/johnpreston/nat-stack-deploy clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-deploy version="{{ deploy_nat_version }}"
 
   - name: Download the latest git version of nat-upgrade
-    git: clone=yes
-         repo=https://github.com/johnpreston/nat-stack-upgrade
-         update=yes
-         force=yes
-         dest=/etc/ansible/roles/nat-stack-upgrade
-         version="{{ upgrade_nat_version }}"
+    git: repo=https://github.com/johnpreston/nat-stack-upgrade clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-upgrade version="{{ upgrade_nat_version }}"
