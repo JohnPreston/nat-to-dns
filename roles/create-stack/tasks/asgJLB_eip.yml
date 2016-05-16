@@ -10,7 +10,11 @@
 - name: Create the asgJLB config file
   template: src=asgJLB.conf.j2 dest=/var/tmp/asgJLB.conf
 
+- name: Create the asgJLB config file
+  template: src=asgJLB_target.conf.j2 dest=/var/tmp/asgJLB-target.conf
+
 - name: Push files to the bucket
   s3: bucket="{{ bucket_name }}" object="{{ item.split('/') | last }}" src="{{ item }}" mode=put s3_url="{{ s3_url }}"
   with_items:
   - "/var/tmp/asgJLB.conf"
+  - "/var/tmp/asgJLB-target.conf"

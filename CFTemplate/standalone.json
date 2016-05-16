@@ -290,7 +290,7 @@
                 "command": "ansible localhost -m yum -a 'name=ansible state=latest'"
               },
               "0007-GetAnsibleInit": {
-                "command": "ansible localhost -m git -a 'git: repo=https://github.com/johnpreston/nat-to-dns clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-init version=dev-0.3'"
+                "command": "ansible localhost -m git -a 'repo=https://github.com/johnpreston/nat-to-dns clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-init version=dev-0.3'"
               },
               "0008-RunAnsibleInit": {
                 "command": "git clone https://github.com/johnpreston/nat-to-dns /var/tmp/nat-to-dns ; ansible-playbook /var/tmp/nat-to-dns/init-stack.yml -e init_nat_version=`head -1 /var/tmp/init_nat_version.conf` -e deploy_nat_version=`head -1 /var/tmp/deploy_nat_version.conf` -e upgrade_nat_version=`head -1 /var/tmp/upgrade_nat_version.conf`"

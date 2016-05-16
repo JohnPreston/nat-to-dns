@@ -17,13 +17,17 @@
   when:
   - debug
 
-- name: Create the Mgmt config file
+- name: Create the Mgmt EIP config file
   template: src=mgmt.conf.j2 dest=/var/tmp/ec2Mgmt.conf
+
+- name: Create the Mgmt target config file
+  template: src=mgmt_target.conf.j2 dest=/var/tmp/ec2Mgmt-target.conf
 
 - name: Push files to the bucket
   s3: bucket="{{ bucket_name }}" object="{{ item.split('/') | last }}" src="{{ item }}" mode=put s3_url="{{ s3_url }}"
   with_items:
   - "/var/tmp/ec2Mgmt.conf"
+  - "/var/tmp/ec2Mgmt-target.conf"
 
 - name: Remove ec2Mgmt EIP from ec2_eips
   set_fact: ec2_eips="{{ ec2_eips | symmetric_difference(ec2Mgmt_eip.results[0].stdout_lines) }}"
