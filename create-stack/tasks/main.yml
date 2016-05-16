@@ -23,6 +23,34 @@
 - name: Create the asgJLB EIP Config
   include: asgJLB_eip.yml
 
+- name: Create the parameters config JSON
+  template: src=cf_parameters.json.j2 dest=/var/tmp/cf_parameters.json
+  tags:
+  - cloudformation
+  - config
+
+- name: Create the syntax
+  shell: aws cloudformation create-stack --stack-name "{{ stack_name }}"
+         --template-url "{{ template_url }}"
+         --capabilities CAPABILITY_IAM
+         --disable-rollback
+         --parameters file:///var/tmp/cf_parameters.json
+         --region eucalyptus
+         --endpoint-url="http://cloudformation.{{ region_dns }}:8773/"
+
+# - name: Create the stack
+#   cloud_formation:
+#     ec2_url="{{ ec2_url }}"
+#     stack_name="test"
+#     state="present"
+#     region="eucalyptus"
+#     template_url="http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/standalone.json"
+#     template_parameters:
+#       KeyName="john"
+#       ImageId="emi-002fcf91"
+#       RegionDNS="cloud.emea.eucalyptus.com"
+#       BucketName="devnat3"
+# S**T doc for the module. What's the right syntax ????
 
   # - name: Create the NAT stack bucket
   #   s3_bucket: name="{{ bucket_name }}" state=present ec2_url="{{ ec2_url }}" s3_url="{{ s3_url }}" tags="{{ item }}"

@@ -3,3 +3,13 @@
   - localhost
   roles:
   - create-stack
+  vars:
+  - parameters:
+    - ParameterKey: BucketName
+      ParameterValue: "{{ bucket_name }}"
+    - ParameterKey: RegionDNS
+      ParameterValue: "{{ region_dns }}"
+    - ParameterKey: ImageId
+      ParameterValue: "{{ image_id }}"
+    - ParameterKey: KeyName
+      ParameterValue: "{{ key_name }}"
