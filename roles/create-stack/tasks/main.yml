@@ -29,7 +29,7 @@
   - cloudformation
   - config
 
-- name: Create the syntax
+- name: Create the NAT2DNS Stack
   shell: aws cloudformation create-stack --stack-name "{{ stack_name }}"
          --template-url "{{ template_url }}"
          --capabilities CAPABILITY_IAM

@@ -1,0 +1,7 @@
+---
+# Parameters always valid for the cloud
+
+cloud_params:
+- ImageId: "{{ image_id }}"
+- KeyName: "{{ key_name }}"
+- RegionDNS: "{{ region_dns }}"

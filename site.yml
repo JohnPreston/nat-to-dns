@@ -3,13 +3,20 @@
   - localhost
   roles:
   - create-stack
+  vars_files:
+  - vars/params.yml
+  - vars/cloud_params.yml
   vars:
-  - parameters:
+  - has_sftp: false
+  - has_elb: false
+  - params:
+    - ParameterKey: StackName
+      ParameterValue: "{{ stack_name }}"
     - ParameterKey: BucketName
-      ParameterValue: "{{ bucket_name }}"
-    - ParameterKey: RegionDNS
-      ParameterValue: "{{ region_dns }}"
-    - ParameterKey: ImageId
-      ParameterValue: "{{ image_id }}"
-    - ParameterKey: KeyName
-      ParameterValue: "{{ key_name }}"
+      ParameterValue: "{{ stack_name }}"
+    - ParameterKey: MgmtDestTarget
+      ParameterValue: "{{ mgmt_dest_target }}"
+    - ParameterKey: SFTPDestTarget
+      ParameterValue: "{{ sftp_dest_target }}"
+    - ParameterKey: ELBDestTarget
+      ParameterValue: "{{ elb_dest_target }}"
