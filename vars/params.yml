@@ -1,0 +1,5 @@
+---
+# Default settings if values aren't set
+elb_dest_target: "{{ mgmt_dest_target }}"
+sftp_dest_target: "{{ mgmt_dest_target }}"
+
