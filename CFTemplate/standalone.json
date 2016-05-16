@@ -7,7 +7,7 @@
       "Type": "String",
       "MinLength": "8",
       "MaxLength": "256",
-      "AllowedPattern": "(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?))"
+      "AllowedPattern": "([0-9]+):(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
     },
     "MgmtDestPort": {
       "Description": "The DNS Name of the target to monitor",
@@ -116,46 +116,6 @@
         "AWS::CloudFormation::Init": {
           "config": {
             "files": {
-              "/var/tmp/target.conf": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Ref": "MgmtSrcPort"
-                      },
-                      ":",
-                      {
-                        "Ref": "MgmtDestTarget"
-                      },
-                      ":",
-                      {
-                        "Ref": "MgmtDestPort"
-                      },
-                      "\n"
-                    ]
-                  ]
-                },
-                "mode": "000600",
-                "owner": "root",
-                "group": "root"
-              },
-              "/var/tmp/stackname.conf": {
-                "content": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Ref": "AWS::StackName"
-                      },
-                      "\n"
-                    ]
-                  ]
-                },
-                "mode": "000600",
-                "owner": "root",
-                "group": "root"
-              },
               "/var/tmp/bucketname.conf": {
                 "content": {
                   "Fn::Join": [
@@ -326,18 +286,17 @@
               "0005-EnableAnsibleLog": {
                 "command": "ansible localhost -m lineinfile -a 'dest=/etc/ansible/ansible.cfg regexp=log_path line=\"log_path = /var/log/ansible.log\"'"
               },
-              "0005-Upgrade ansible": {
+              "0005-UpgradeAnsible": {
                 "command": "ansible localhost -m yum -a 'name=ansible state=latest'"
               },
-              "0008-RunAnsibleInit": {
-                "command": "git clone https://github.com/johnpreston/nat-to-dns /var/tmp/nat-to-dns ; ansible-playbook /var/tmp/nat-to-dns/ansible-play/init.yml -e init_nat_version=`head -1 /var/tmp/init_nat_version.conf` -e deploy_nat_version=`head -1 /var/tmp/deploy_nat_version.conf` -e upgrade_nat_version=`head -1 /var/tmp/upgrade_nat_version.conf`"
+              "0007-GetAnsibleInit": {
+                "command": "ansible localhost -m git -a 'git: repo=https://github.com/johnpreston/nat-to-dns clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-init version=dev-0.3'"
               },
-              "0009-RunAnsibleInitStack": {
-                "command": "ansible-playbook /var/tmp/nat-to-dns/ansible-play/init-stack.yml -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf` -e stackname=`head -1 /var/tmp/stackname.conf`",
-                "ignoreErrors": "True"
+              "0008-RunAnsibleInit": {
+                "command": "git clone https://github.com/johnpreston/nat-to-dns /var/tmp/nat-to-dns ; ansible-playbook /var/tmp/nat-to-dns/init-stack.yml -e init_nat_version=`head -1 /var/tmp/init_nat_version.conf` -e deploy_nat_version=`head -1 /var/tmp/deploy_nat_version.conf` -e upgrade_nat_version=`head -1 /var/tmp/upgrade_nat_version.conf`"
               },
               "0010-RunAnsibleJLB": {
-                "command": "ansible-playbook /var/tmp/nat-to-dns/ansible-play/deploy-stack.yml -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf`",
+                "command": "ansible-playbook /var/tmp/nat-to-dns/deploy-stack.yml -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf`",
                 "ignoreErrors": "True"
               }
             }

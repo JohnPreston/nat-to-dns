@@ -2,6 +2,9 @@
 # Parameters always valid for the cloud
 
 cloud_params:
-- ImageId: "{{ image_id }}"
-- KeyName: "{{ key_name }}"
-- RegionDNS: "{{ region_dns }}"
+- ParameterKey: ImageId
+  ParameterValue: "{{ image_id }}"
+- ParameterKey: KeyName
+  ParameterValue: "{{ key_name }}"
+- ParameterKey: RegionDNS
+  ParameterValue: "{{ region_dns }}"
