@@ -1,0 +1,29 @@
+#
+# Get the addresses to use
+#
+
+- name: Debug ec2_eips
+  debug: msg="{{ ec2_eips }}"
+  when:
+  - debug
+
+- name: Random select an EIP
+  shell: echo {{item }}
+  register: ec2SFTP_eip
+  with_items:
+    - "{{ ec2_eips | random }}"
+  tags:
+  - s3
+  - ec2
+  - eip
+
+- name: Create the SFTP config file
+  template: src=sftp.conf.j2 dest=/var/tmp/ec2SFTP.conf
+
+- name: Push files to the bucket
+  s3: bucket="{{ bucket_name }}" object="{{ item.split('/') | last }}" src="{{ item }}" mode=put s3_url="{{ s3_url }}"
+  with_items:
+  - "/var/tmp/ec2SFTP.conf"
+
+- name: Remove ec2SFTP EIP from ec2_eips
+  set_fact: ec2_eips="{{ ec2_eips | symmetric_difference(ec2SFTP_eip.results[0].stdout_lines) }}"

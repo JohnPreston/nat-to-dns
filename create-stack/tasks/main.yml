@@ -1,0 +1,31 @@
+---
+# Play to deploy a new NAT Stack
+# Remove the ec2Mgmt dependency building all artifacts prior to the CF kick off
+
+- name: Describe the addresses available
+  shell: aws ec2 describe-addresses --endpoint-url={{ ec2_url }} --output=text --region=eucalyptus | grep -v i\- | awk '{print $3}'
+  register: eips
+
+- name: Set ec2_eips list
+  set_fact: ec2_eips="{{ eips.stdout_lines  }}"
+
+- name: Debug ec2_eips
+  debug: msg="{{ ec2_eips }}"
+  when:
+  - debug
+
+- name: Create the ec2Mgmt EIP Config
+  include: ec2Mgmt_eip.yml
+
+- name: Create the ec2SFTP EIP Config
+  include: ec2SFTP_eip.yml
+
+- name: Create the asgJLB EIP Config
+  include: asgJLB_eip.yml
+
+
+  # - name: Create the NAT stack bucket
+  #   s3_bucket: name="{{ bucket_name }}" state=present ec2_url="{{ ec2_url }}" s3_url="{{ s3_url }}" tags="{{ item }}"
+  #   with_items:
+  #   - {'stack_name': "{{ stack_name }}" }
+  # Cant use because of a py module missing the in module and Euca doesnt support all API calls in this module

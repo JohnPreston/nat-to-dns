@@ -1,0 +1,4 @@
+{{ ec2_eips[0] }}
+{% if ec2_eips|length >= 2 %}
+{{ ec2_eips[1] }}
+{% endif %}

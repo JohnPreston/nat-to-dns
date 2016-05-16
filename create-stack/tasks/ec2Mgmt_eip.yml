@@ -1,0 +1,29 @@
+#
+# Get the addresses to use
+#
+
+- name: Random select an EIP
+  shell: echo {{item }}
+  with_items:
+    - "{{ ec2_eips | random }}"
+  register: ec2Mgmt_eip
+  tags:
+  - s3
+  - ec2
+  - eip
+
+- name: Debug ec2Mgmt EIP
+  debug: msg="{{ ec2Mgmt_eip.results[0].stdout }}"
+  when:
+  - debug
+
+- name: Create the Mgmt config file
+  template: src=mgmt.conf.j2 dest=/var/tmp/ec2Mgmt.conf
+
+- name: Push files to the bucket
+  s3: bucket="{{ bucket_name }}" object="{{ item.split('/') | last }}" src="{{ item }}" mode=put s3_url="{{ s3_url }}"
+  with_items:
+  - "/var/tmp/ec2Mgmt.conf"
+
+- name: Remove ec2Mgmt EIP from ec2_eips
+  set_fact: ec2_eips="{{ ec2_eips | symmetric_difference(ec2Mgmt_eip.results[0].stdout_lines) }}"
