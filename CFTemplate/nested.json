@@ -237,6 +237,50 @@
           }
         }
       }
+    },
+    "stackJLB": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Condition": "CreateStackELB",
+      "Properties": {
+        "Tags": [],
+        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/asgJLB.json",
+        "TimeoutInMinutes": "15",
+        "Parameters": {
+          "ELBDestTarget": {
+            "Ref": "ELBDestTarget"
+          },
+          "APIProtocol": {
+            "Ref": "APIProtocol"
+          },
+          "APIPort": {
+            "Ref": "APIPort"
+          },
+          "KeyName": {
+            "Ref": "KeyName"
+          },
+          "InstanceType": {
+            "Ref": "InstanceType"
+          },
+          "ImageId": {
+            "Ref": "ImageId"
+          },
+          "BucketName": {
+            "Ref": "BucketName"
+          },
+          "RegionDNS": {
+            "Ref": "RegionDNS"
+          },
+          "NTPServer": {
+            "Ref": "NTPServer"
+          },
+          "SSHLocation": {
+            "Ref": "SSHLocation"
+          },
+          "SSHServerPort": {
+            "Ref": "SSHServerPort"
+          }
+        }
+      }
     }
   },
   "Outputs": {}
