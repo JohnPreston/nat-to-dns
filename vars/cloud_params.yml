@@ -9,6 +9,10 @@ cloud_params:
   ParameterValue: "{{ key_name }}"
 - ParameterKey: RegionDNS
   ParameterValue: "{{ region_dns }}"
+- ParameterKey: APIProtocol
+  ParameterValue: "{{ api_protocol }}"
+- ParameterKey: APIPort
+  ParameterValue: "{{ api_port }}"
 - ParameterKey: HasSFTP
   ParameterValue: "{{ has_sftp|string }}"
 - ParameterKey: HasELB

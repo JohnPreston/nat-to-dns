@@ -24,7 +24,7 @@
   template: src=mgmt_target.conf.j2 dest=/var/tmp/ec2Mgmt-target.conf
 
 - name: Push files to the bucket
-  s3: bucket="{{ bucket_name }}" object="{{ item.split('/') | last }}" src="{{ item }}" mode=put s3_url="{{ s3_url }}"
+  s3: bucket="{{ stack_name }}" object="{{ item.split('/') | last }}" src="{{ item }}" mode=put s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
   with_items:
   - "/var/tmp/ec2Mgmt.conf"
   - "/var/tmp/ec2Mgmt-target.conf"
