@@ -1,1 +1,3 @@
-{{ sftp_dest_target }}
+{% for item in sftp_dest_target.split(',') %}
+{{ item }}
+{% endfor %}

@@ -3,3 +3,12 @@
 elb_dest_target: "{{ mgmt_dest_target }}"
 sftp_dest_target: "{{ mgmt_dest_target }}"
 
+params:
+- ParameterKey: BucketName
+  ParameterValue: "{{ stack_name }}"
+- ParameterKey: MgmtDestTarget
+  ParameterValue: "{{ mgmt_dest_target.split(',')[0] }}"
+- ParameterKey: SFTPDestTarget
+  ParameterValue: "{{ sftp_dest_target.split(',')[0] }}"
+- ParameterKey: ELBDestTarget
+  ParameterValue: "{{ elb_dest_target.split(',')[0] }}"

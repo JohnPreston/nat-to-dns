@@ -1,1 +1,3 @@
-{{ mgmt_dest_target }}
+{% for item in  mgmt_dest_target.split(',') %}
+{{ item }}
+{% endfor %}

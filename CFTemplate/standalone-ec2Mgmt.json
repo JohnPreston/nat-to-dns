@@ -6,7 +6,7 @@
       "Description": "The DNS Name of the target to monitor",
       "Type": "String",
       "MinLength": "8",
-      "MaxLength": "256",
+      "MaxLength": "1024",
       "AllowedPattern": "([0-9]+):(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
     },
     "APIProtocol": {

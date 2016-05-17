@@ -9,12 +9,3 @@
   vars:
   - has_sftp: false
   - has_elb: false
-  - params:
-    - ParameterKey: BucketName
-      ParameterValue: "{{ stack_name }}"
-    - ParameterKey: MgmtDestTarget
-      ParameterValue: "{{ mgmt_dest_target }}"
-    - ParameterKey: SFTPDestTarget
-      ParameterValue: "{{ sftp_dest_target }}"
-    - ParameterKey: ELBDestTarget
-      ParameterValue: "{{ elb_dest_target }}"
