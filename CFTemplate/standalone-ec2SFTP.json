@@ -2,7 +2,7 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Eucalyptus pre-ELB layer using HAProxy to transmit to DNS based destination. Author : John Mille",
   "Parameters": {
-    "MgmtDestTarget": {
+    "SFTPDestTarget": {
       "Description": "The DNS Name of the target to monitor",
       "Type": "String",
       "MinLength": "8",
@@ -97,7 +97,7 @@
     }
   },
   "Resources": {
-    "ec2Mgmt": {
+    "ec2SFTP": {
       "Metadata": {
         "AWS::CloudFormation::Init": {
           "config": {
@@ -123,7 +123,7 @@
                   "Fn::Join": [
                     "",
                     [
-                      "ec2Mgmt\n"
+                      "ec2SFTP\n"
                     ]
                   ]
                 },
@@ -323,7 +323,7 @@
                 "{\n",
                 "  /usr/bin/cfn-signal -e 1 -r \"$1\" '",
                 {
-                  "Ref": "WHec2Mgmt"
+                  "Ref": "WHec2SFTP"
                 },
                 "'\n",
                 "  exit 1\n",
@@ -345,7 +345,7 @@
                 {
                   "Ref": "APIPort"
                 },
-                " -r ec2Mgmt ",
+                " -r ec2SFTP ",
                 "--region ",
                 {
                   "Ref": "AWS::Region"
@@ -360,7 +360,7 @@
                 "# All done so signal success\n",
                 "/usr/bin/cfn-signal -e 0 -r \"Server setup complete\" '",
                 {
-                  "Ref": "WHec2Mgmt"
+                  "Ref": "WHec2SFTP"
                 },
                 "'\n"
               ]
@@ -370,14 +370,14 @@
       },
       "Type": "AWS::EC2::Instance"
     },
-    "WHec2Mgmt": {
+    "WHec2SFTP": {
       "Type": "AWS::CloudFormation::WaitConditionHandle"
     },
-    "WCec2Mgmt": {
+    "WCec2SFTP": {
       "Type": "AWS::CloudFormation::WaitCondition",
       "Properties": {
         "Handle": {
-          "Ref": "WHec2Mgmt"
+          "Ref": "WHec2SFTP"
         },
         "Timeout": "2000"
       }

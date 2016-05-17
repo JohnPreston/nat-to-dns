@@ -19,9 +19,13 @@
 
 - name: Create the ec2SFTP EIP Config
   include: ec2SFTP_eip.yml
+  when:
+  - has_sftp
 
 - name: Create the asgJLB EIP Config
   include: asgJLB_eip.yml
+  when:
+  - has_elb
 
 - name: Create the parameters config JSON
   template: src=cf_parameters.json.j2 dest=/var/tmp/cf_parameters.json

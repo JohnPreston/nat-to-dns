@@ -23,8 +23,28 @@
       "MaxLength": "256",
       "AllowedPattern": "([0-9]+):(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
     },
+    "HasSFTP": {
+      "Description": "Defines if stackSFTP should be created",
+      "Type": "String",
+      "Default": "False",
+      "AllowedValues": [
+        "False",
+        "True"
+      ],
+      "ConstraintDescription": "Must be the String() of the booleans"
+    },
+    "HasELB": {
+      "Description": "Defines if stackSFTP should be created",
+      "Type": "String",
+      "Default": "False",
+      "AllowedValues": [
+        "False",
+        "True"
+      ],
+      "ConstraintDescription": "Must be the String() of the booleans"
+    },
     "APIProtocol": {
-      "Description": "WebServer EC2 instance type",
+      "Description": "Cloud API Protocol",
       "Type": "String",
       "Default": "http://",
       "AllowedValues": [
@@ -112,16 +132,78 @@
       "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x"
     }
   },
+  "Conditions": {
+    "CreateStackSFTP": {
+      "Fn::Equals": [
+        {
+          "Ref": "HasSFTP"
+        },
+        "True"
+      ]
+    },
+    "CreateStackELB": {
+      "Fn::Equals": [
+        {
+          "Ref": "HasELB"
+        },
+        "True"
+      ]
+    }
+  },
   "Resources": {
-    "StandaloneNoELB": {
+    "stackMgmt": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "Tags": [],
-        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/standalone.json",
+        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/standalone-ec2Mgmt.json",
         "TimeoutInMinutes": "15",
         "Parameters": {
           "MgmtDestTarget": {
             "Ref": "MgmtDestTarget"
+          },
+          "APIProtocol": {
+            "Ref": "APIProtocol"
+          },
+          "APIPort": {
+            "Ref": "APIPort"
+          },
+          "KeyName": {
+            "Ref": "KeyName"
+          },
+          "InstanceType": {
+            "Ref": "InstanceType"
+          },
+          "ImageId": {
+            "Ref": "ImageId"
+          },
+          "BucketName": {
+            "Ref": "BucketName"
+          },
+          "RegionDNS": {
+            "Ref": "RegionDNS"
+          },
+          "NTPServer": {
+            "Ref": "NTPServer"
+          },
+          "SSHLocation": {
+            "Ref": "SSHLocation"
+          },
+          "SSHServerPort": {
+            "Ref": "SSHServerPort"
+          }
+        }
+      }
+    },
+    "stackSFTP": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Condition": "CreateStackSFTP",
+      "Properties": {
+        "Tags": [],
+        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/standalone-ec2SFTP.json",
+        "TimeoutInMinutes": "15",
+        "Parameters": {
+          "SFTPDestTarget": {
+            "Ref": "SFTPDestTarget"
           },
           "APIProtocol": {
             "Ref": "APIProtocol"
