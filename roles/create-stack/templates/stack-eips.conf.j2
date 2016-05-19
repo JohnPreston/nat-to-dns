@@ -1,0 +1,17 @@
+[ec2Mgmt]
+{{ ec2Mgmt_eip.results[0].stdout }}
+
+{% if has_elb %}
+[ec2SFTP]
+{{ ec2SFTP_eip.results[0].stdout }}
+{% endif %}
+
+{% if has_sftp %}
+[asgJLB]
+{% if asgJLB_eip0 %}
+{{ asgJLB_eip0.results[0].stdout }}
+{% endif %}
+{% if asgJLB_eip1 %}
+{{ asgJLB_eip1.results[0].stdout }}
+{% endif %}
+{% endif %}

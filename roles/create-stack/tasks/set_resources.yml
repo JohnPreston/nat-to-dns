@@ -1,0 +1,15 @@
+---
+# Set CF stack resources configuration
+
+- name: Create the ec2Mgmt EIP Config
+  include: ec2Mgmt_eip.yml
+
+- name: Create the ec2SFTP EIP Config
+  include: ec2SFTP_eip.yml
+  when:
+  - has_sftp
+
+- name: Create the asgJLB EIP Config
+  include: asgJLB_eip.yml
+  when:
+  - has_elb

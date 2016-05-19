@@ -1,4 +1,4 @@
-{{ ec2_eips[0] }}
+{{ asgJLB_eip0.results[0].stdout_lines }}
 {% if ec2_eips|length >= 2 %}
-{{ ec2_eips[1] }}
+{{ asgJLB_eip1.results[0].stdout_lines }}
 {% endif %}
