@@ -10,7 +10,6 @@ ansible-playbook site.yml \
     -e key_name=john \
     -e mgmt_dest_target="80:euca-109-104-120-16.eucalyptus.cloud.emea.eucalyptus.com:8080" \
     -e elb_dest_target="80:demo-dest-elb-000181516251.lb.cloud.emea.eucalyptus.com:80" \
-    -e sftp_dest_target="80:demo-dest-elb-000181516251.lb.cloud.emea.eucalyptus.com:80,80:euca-109-104-120-16.eucalyptus.cloud.emea.eucalyptus.com:8080" \
+    -e sftp_dest_target="22:demo-dest-elb-000181516251.lb.cloud.emea.eucalyptus.com:22" \
     -e has_elb=True \
     -e has_sftp=True
-
