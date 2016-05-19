@@ -6,9 +6,21 @@
 
   - name: Download the latest version of init-stack
     git: repo=https://github.com/johnpreston/nat-stack-init clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-init version="{{ init_nat_version }}"
+    register: git_init_stack
+    until: git_init_stack|success
+    retries: 10
+    delay: 2
 
   - name: Download the latest git version of nat-deploy
     git: repo=https://github.com/johnpreston/nat-stack-deploy clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-deploy version="{{ deploy_nat_version }}"
+    register: git_init_deploy
+    until: git_init_deploy|success
+    retries: 10
+    delay: 2
 
   - name: Download the latest git version of nat-upgrade
     git: repo=https://github.com/johnpreston/nat-stack-upgrade clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-upgrade version="{{ upgrade_nat_version }}"
+    register: git_init_upgrade
+    until: git_init_upgrade|success
+    retries: 10
+    delay: 2
