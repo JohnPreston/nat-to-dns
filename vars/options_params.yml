@@ -1,0 +1,5 @@
+options_params:
+- ParameterKey: HasSFTP
+  ParameterValue: "{{ has_sftp|string }}"
+- ParameterKey: HasELB
+  ParameterValue: "{{ has_elb|string }}"

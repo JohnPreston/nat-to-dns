@@ -1,0 +1,165 @@
+---
+# Delete the NAT2DNS stack
+
+- name: Get the global EIP configuration file
+  s3: bucket="{{ nat2dns_bucket }}" object="{{ item }}" dest="/var/tmp/{{ item }}.latest"
+      mode=get s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
+  with_items:
+  - "eips-global.conf"
+  tags:
+  - new
+
+- name: Parse all available EIPs
+  shell: grep -v booked /var/tmp/eips-global.conf.latest
+  register: eips
+  tags:
+  - new
+
+- name: Set ec2_eips list
+  set_fact: ec2_eips="{{ eips.stdout_lines }}"
+  tags:
+  - new
+
+- name: Debug ec2_eips
+  debug: msg="{{ ec2_eips }}"
+  when:
+  - debug
+
+- name: Checks that the NAT2DNS exists
+  shell: aws cloudformation describe-stacks
+         --stack-name "{{ stack_name }}"
+         --region eucalyptus
+         --endpoint-url="http://cloudformation.{{ region_dns }}:8773/"
+  tags:
+  - cloudformation
+  - fool_proof
+  register: stacks_list
+
+- name: Set stacks list
+  set_fact: stacks="{{ stacks_list.stdout|from_json}}"
+
+- name: Debug stacks length
+  debug: msg="{{ stacks.Stacks|length }}"
+  when:
+  - debug
+
+- name: Stop if no Stack found
+  fail: msg="FAILED - There is no stack with the name {{ stack_name }}"
+  when:
+  - "{{ stacks.Stacks|length != 1 }}"
+  tags:
+  - fool_proof
+  - failed
+
+- name: Get the stack configuration
+  s3: bucket="{{ stack_name }}"
+      object="{{ item }}-eips.conf"
+      dest="/var/tmp/{{ item }}"
+      mode=get
+      s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
+  with_items:
+  - "{{ stack_name }}"
+  tags:
+  - new
+
+- name: Parse ec2Mgmt EIP
+  shell: echo "{{ lookup('ini', 'eip section=ec2Mgmt file=/var/tmp/{{ stack_name }}-eips.conf') }}"
+  register: ec2Mgmt_eip
+
+- name: Parse ec2SFTP EIP
+  shell: echo "{{ lookup('ini', 'eip section=ec2SFTP file=/var/tmp/{{ stack_name }}-eips.conf') }}"
+  register: ec2SFTP_eip
+  ignore_errors: True
+
+
+- name: Parse asgJLB EIP 0
+  shell: echo "{{ lookup('ini', 'eip0 section=asgJLB file=/var/tmp/{{ stack_name }}-eips.conf') }}"
+  register: asgJLB_eip0
+  ignore_errors: True
+
+- name: Parse asgJLB EIP 1
+  shell: echo "{{ lookup('ini', 'eip1 section=asgJLB file=/var/tmp/{{ stack_name }}-eips.conf') }}"
+  register: asgJLB_eip1
+  ignore_errors: True
+
+- name: Debug ec2Mgmt EIP
+  debug: msg="{{ ec2Mgmt_eip.stdout }}"
+  when:
+  - debug
+
+- name: Debug ec2SFTP
+  debug: msg="{{ ec2SFTP_eip.stdout }}"
+  when:
+  - "{{ ec2SFTP_eip|success }}"
+  - debug
+  ignore_errors: True
+
+- name: Debug asgJLB EIP 0
+  debug: msg="{{ asgJLB_eip0.stdout }}"
+  when:
+  - "{{ asgJLB_eip0|success }}"
+  - debug
+  ignore_errors: True
+
+- name: Debug asgJLB EIP 1
+  debug: msg="{{ asgJLB_eip1.stdout }}"
+  when:
+  - "{{ asgJLB_eip1|success }}"
+  - debug
+  ignore_errors: True
+
+- name: Update the EIP global list with ec2Mgmt
+  set_fact: ec2_eips="{{ ec2_eips | union(ec2Mgmt_eip.stdout_lines) }}"
+
+- name: Update the EIP global list with ec2SFTP
+  set_fact: ec2_eips="{{ ec2_eips | union(ec2SFTP_eip.stdout_lines) }}"
+  when:
+  - "{{ ec2SFTP_eip|success }}"
+
+- name: Update the EIP global list with asgJLB EIP 0
+  set_fact: ec2_eips="{{ ec2_eips | union(asgJLB_eip0.stdout_lines) }}"
+  when:
+  - "{{ asgJLB_eip1|success }}"
+
+- name: Update the EIP global list with asgJLB EIP 1
+  set_fact: ec2_eips="{{ ec2_eips | union(asgJLB_eip1.stdout_lines) }}"
+  when:
+  - "{{ asgJLB_eip1|success }}"
+
+- name: Debug
+  debug: msg="{{ ec2_eips }}"
+  when:
+  - debug
+
+- name: Create the new EIP Global config file
+  template: src=eip-global-new.conf.j2 dest=/var/tmp/eips-global.conf
+
+- name: Upload the nat2dns config files with timestamps
+  s3: bucket="{{ nat2dns_bucket }}"
+      object="{{ ansible_date_time.date }}-{{ ansible_date_time.tz }}/{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}/{{ item.split('/') | last }}"
+      src="{{ item }}"
+      mode=put s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
+  with_items:
+  - "/var/tmp/eips-global.conf"
+  tags:
+  - config
+  - global
+
+- name: Upload the nat2dns config file
+  s3: bucket="{{ nat2dns_bucket }}"
+      object="{{ item.split('/') | last }}"
+      src="{{ item }}"
+      mode=put
+      s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
+  with_items:
+  - "/var/tmp/eips-global.conf"
+  tags:
+  - config
+  - global
+
+
+- name: Delete the stack
+  shell: aws cloudformation delete-stack
+         --stack-name "{{ stack_name }}"
+         --region eucalyptus
+         --endpoint-url="http://cloudformation.{{ region_dns }}:8773/"

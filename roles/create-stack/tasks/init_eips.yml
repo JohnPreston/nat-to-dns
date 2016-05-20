@@ -24,3 +24,8 @@
   debug: msg="{{ ec2_eips }}"
   when:
   - debug
+
+- name: FAILED - Not enough EIPs available
+  fail: msg="FAILED - Not enough EIPs available"
+  when:
+  - "{{ eips.stdout_lines | length < 1 }}"

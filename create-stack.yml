@@ -1,10 +1,12 @@
 
 - hosts:
   - localhost
+#  - NAT2DNS-handler
   roles:
   - create-stack
   vars_files:
   - vars/params.yml
+  - vars/options_params.yml
   - vars/cloud_params.yml
   vars:
   - has_sftp: false

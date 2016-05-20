@@ -2,19 +2,20 @@
 # Play to deploy a new NAT Stack
 # Remove the ec2Mgmt dependency building all artifacts prior to the CF kick off
 
+- name: FOOL PROOF
+  include: checklist.yml
+
 - name: Init configuration for the EIPs
   include: init_eips.yml
-
-- name: FAILED - Not enough EIPs available
-  fail: msg="FAILED - Not enough EIPs available"
-  when:
-  - "{{ eips.stdout_lines | length < 1 }}"
 
 - name: Set resources configuration
   include: set_resources.yml
 
 - name: Set the new EIPs configuration
   include: set_eips.yml
+
+- name: Set options together
+  set_fact: params="{{ default_params | union(options_params) }}"
 
 - name: Create the parameters config JSON
   template: src=cf_parameters.json.j2 dest=/var/tmp/cf_parameters.json
@@ -32,9 +33,4 @@
          --endpoint-url="http://cloudformation.{{ region_dns }}:8773/"
   tags:
   - cloudformation
-
-# - name: Describe the addresses available
-#   shell: aws ec2 describe-addresses --endpoint-url="{{api_protocol }}ec2.{{ region_dns }}:{{ api_port }}" --output=text --region=eucalyptus | grep -v i\- | awk '{print $3}'
-#   register: eips
-# Disabled - new version uses the s3 config file to keep track of EIPs
-# Would be task #1
+  - create

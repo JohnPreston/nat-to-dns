@@ -1,17 +1,17 @@
 [ec2Mgmt]
-{{ ec2Mgmt_eip.results[0].stdout }}
+eip={{ ec2Mgmt_eip.results[0].stdout }}
 
 {% if has_sftp|bool %}
 [ec2SFTP]
-{{ ec2SFTP_eip.results[0].stdout }}
+eip={{ ec2SFTP_eip.results[0].stdout }}
 {% endif %}
 
 {% if has_elb|bool %}
 [asgJLB]
 {% if asgJLB_eip0 %}
-{{ asgJLB_eip0.results[0].stdout }}
+eip0={{ asgJLB_eip0.results[0].stdout }}
 {% endif %}
 {% if asgJLB_eip1 %}
-{{ asgJLB_eip1.results[0].stdout }}
+eip1={{ asgJLB_eip1.results[0].stdout }}
 {% endif %}
 {% endif %}
