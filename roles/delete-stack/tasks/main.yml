@@ -1,11 +1,11 @@
 ---
 # Delete the NAT2DNS stack
 
-- name:  Init EIPs
-  include: init_eips.yml
-
 - name: Fool proof
   include: checklist.yml
+
+- name:  Init EIPs
+  include: init_eips.yml
 
 - name: Parse the stack configuration
   include: parse_config.yml
