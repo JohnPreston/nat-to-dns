@@ -12,7 +12,7 @@
 - name: Update the EIP global list with asgJLB EIP 0
   set_fact: ec2_eips="{{ ec2_eips | union(asgJLB_eip0.stdout_lines) }}"
   when:
-  - "{{ asgJLB_eip1|success }}"
+  - "{{ asgJLB_eip0|success }}"
 
 - name: Update the EIP global list with asgJLB EIP 1
   set_fact: ec2_eips="{{ ec2_eips | union(asgJLB_eip1.stdout_lines) }}"
