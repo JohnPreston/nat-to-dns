@@ -1,12 +1,22 @@
 
 - hosts:
   - localhost
-#  - NAT2DNS-handler
+  tasks:
+  - name: Set AWS ACCESS KEY
+    set_fact: aws_access_key="{{ ansible_env.AWS_ACCESS_KEY }}"
+    when:
+    - "{{ 'AWS_ACCESS_KEY' in ansible_env }}"
+
+  - name: Set AWS SECRET KEY
+    set_fact: aws_secret_key="{{ ansible_env.AWS_SECRET_KEY }}"
+    when:
+    - "{{ 'AWS_SECRET_KEY' in ansible_env }}"
+
+- hosts:
+  - localhost
   roles:
   - create-stack
   environment:
-  - AWS_ACCESS_KEY: "{{ aws_access_key }}"
-  - AWS_SECRET_KEY: "{{ aws_secret_key }}"
   - AWS_CREDENTIAL_FILE: /var/tmp/awsrc
   vars_files:
   - vars/params.yml
