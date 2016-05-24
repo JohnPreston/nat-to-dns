@@ -1,0 +1,569 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Eucalyptus pre-ELB layer using HAProxy to transmit to DNS based destination. Author : John Mille",
+  "Parameters": {
+    "SFTPDestTarget": {
+      "Description": "The DNS Name of the target to monitor",
+      "Type": "String",
+      "MinLength": "8",
+      "MaxLength": "256",
+      "AllowedPattern": "([0-9]+):(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
+    },
+    "APIProtocol": {
+      "Description": "WebServer EC2 instance type",
+      "Type": "String",
+      "Default": "http://",
+      "AllowedValues": [
+        "http://",
+        "https://"
+      ],
+      "ConstraintDescription": "must be a HTTP(S) protocol"
+    },
+    "APIPort": {
+      "Description": "Cloud API Port",
+      "Type": "Number",
+      "Default": 8773,
+      "MinValue": 20,
+      "MaxValue": 65535,
+      "ConstraintDescription": "must be a valid port Number"
+    },
+    "SSHLocation": {
+      "Description": "The IP address range that can be used to SSH to the EC2 instances",
+      "Type": "String",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "Default": "0.0.0.0/0",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+    },
+    "SSHServerPort": {
+      "Description": "TCP/IP port for Admin SSH",
+      "Type": "Number",
+      "Default": 2223,
+      "ConstraintDescription": "must be a valid port Number"
+    },
+    "KeyName": {
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instances",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "255",
+      "AllowedPattern": "[\\x20-\\x7E]*",
+      "ConstraintDescription": "can contain only ASCII characters."
+    },
+    "InstanceType": {
+      "Description": "WebServer EC2 instance type",
+      "Type": "String",
+      "Default": "m1.small",
+      "AllowedValues": [
+        "t1.micro",
+        "m1.small",
+        "m1.medium",
+        "m1.large",
+        "c1.medium"
+      ],
+      "ConstraintDescription": "must be a valid EC2 instance type."
+    },
+    "ImageId": {
+      "Description": "Name of the image to be used",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "255",
+      "AllowedPattern": "emi-[\\x20-\\x7E]*",
+      "ConstraintDescription": "can contain only ASCII characters."
+    },
+    "BucketName": {
+      "Description": "Name of the bucket to be used",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "255",
+      "AllowedPattern": "[\\x20-\\x7E]*",
+      "ConstraintDescription": "can contain only ASCII characters."
+    },
+    "RegionDNS": {
+      "Description": "The region DNS zone (ie: eu-west-1.amazonaws.com)",
+      "Type": "String",
+      "MinLength": "8",
+      "MaxLength": "256",
+      "AllowedPattern": "(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?))"
+    },
+    "NTPServer": {
+      "Description": "The IP address to sync NTP on the first run",
+      "Type": "String",
+      "MinLength": "7",
+      "MaxLength": "15",
+      "Default": "92.63.212.161",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})",
+      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x"
+    }
+  },
+  "Resources": {
+    "lcAsgSFTP": {
+      "Metadata": {
+        "AWS::CloudFormation::Init": {
+          "config": {
+            "files": {
+              "/var/tmp/bucketname.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "BucketName"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/whoami.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "ec2SFTP\n"
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/admin_port.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "",
+                      {
+                        "Ref": "SSHServerPort"
+                      }
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/security_group.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "sgPreELBGroup",
+                          "GroupId"
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/init_nat_version.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "master\n"
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/deploy_nat_version.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "master\n"
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/upgrade_nat_version.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "master\n"
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/s3.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "APIProtocol"
+                      },
+                      "s3.",
+                      {
+                        "Ref": "RegionDNS"
+                      },
+                      ":",
+                      {
+                        "Ref": "APIPort"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              },
+              "/var/tmp/ec2.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "APIProtocol"
+                      },
+                      "compute.",
+                      {
+                        "Ref": "RegionDNS"
+                      },
+                      ":",
+                      {
+                        "Ref": "APIPort"
+                      },
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode": "000600",
+                "owner": "root",
+                "group": "root"
+              }
+            },
+            "commands": {
+              "0000-repos": {
+                "command": "yum install http://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm -y || echo Already there"
+              },
+              "0001-haproxy": {
+                "command": "haproxy -v || yum install haproxy -y"
+              },
+              "0002-ansible": {
+                "command": " ansible --version || yum install ansible -y"
+              },
+              "0003-git": {
+                "command": "git --version || yum install git -y"
+              },
+              "0004-dependencies": {
+                "command": "yum install python-netaddr -y"
+              },
+              "0005-EnableAnsibleLog": {
+                "command": "ansible localhost -m lineinfile -a 'dest=/etc/ansible/ansible.cfg regexp=log_path line=\"log_path = /var/log/ansible.log\"'"
+              },
+              "0005-UpgradeAnsible": {
+                "command": "ansible localhost -m yum -a 'name=ansible state=latest'"
+              },
+              "0007-GetAnsibleInit": {
+                "command": "ansible localhost -m git -a 'repo=https://github.com/johnpreston/nat-to-dns clone=yes update=yes force=yes dest=/etc/ansible/roles/nat-stack-init'"
+              },
+              "0008-RunAnsibleInit": {
+                "command": "git clone https://github.com/johnpreston/nat-to-dns /var/tmp/nat-to-dns ; ansible-playbook /var/tmp/nat-to-dns/init-stack.yml -e init_nat_version=`head -1 /var/tmp/init_nat_version.conf` -e deploy_nat_version=`head -1 /var/tmp/deploy_nat_version.conf` -e upgrade_nat_version=`head -1 /var/tmp/upgrade_nat_version.conf`"
+              },
+              "0010-RunAnsibleSFTP": {
+                "command": "ansible-playbook /var/tmp/nat-to-dns/deploy-stack.yml -e ec2_url=`head -1 /var/tmp/ec2.conf` -e s3_url=`head -1 /var/tmp/s3.conf`",
+                "ignoreErrors": "True"
+              }
+            }
+          }
+        }
+      },
+      "Properties": {
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "ImageId": {
+          "Ref": "ImageId"
+        },
+        "IamInstanceProfile": {
+          "Ref": "HAProxyProfile"
+        },
+        "SecurityGroups": [
+          {
+            "Ref": "sgPreELBGroup"
+          }
+        ],
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash\n",
+                "ntpdate -u ",
+                {
+                  "Ref": "NTPServer"
+                },
+                "\n",
+                "# Helper function\n",
+                "function error_exit\n",
+                "{\n",
+                "  /usr/bin/cfn-signal -e 1 -r \"$1\" '",
+                {
+                  "Ref": "WHasgSFTP"
+                },
+                "'\n",
+                "  exit 1\n",
+                "}\n",
+                "# Run cfn init\n",
+                "/usr/bin/cfn-init -s ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                " -u ",
+                {
+                  "Ref": "APIProtocol"
+                },
+                "cloudformation.",
+                {
+                  "Ref": "RegionDNS"
+                },
+                ":",
+                {
+                  "Ref": "APIPort"
+                },
+                " -r lcAsgSFTP ",
+                "--region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                " --role=",
+                {
+                  "Ref": "HAProxyRole"
+                },
+                " || error_exit 'Failed to run /usr/bin/cfn-init'\n",
+                "# Start up the /usr/bin/cfn-hup daemon to listen for changes\n",
+                "/usr/bin/cfn-hup || error_exit 'Failed to start /usr/bin/cfn-hup'\n",
+                "# All done so signal success\n",
+                "/usr/bin/cfn-signal -e 0 -r \"Server setup complete\" '",
+                {
+                  "Ref": "WHasgSFTP"
+                },
+                "'\n"
+              ]
+            ]
+          }
+        }
+      },
+      "Type": "AWS::AutoScaling::LaunchConfiguration"
+    },
+    "asgSFTP": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": {
+          "Fn::GetAZs": ""
+        },
+        "LaunchConfigurationName": {
+          "Ref": "lcAsgSFTP"
+        },
+        "MinSize": "1",
+        "MaxSize": "1",
+        "MetricsCollection": [
+          {
+            "Granularity": "1Minute",
+            "Metrics": [
+              "GroupMinSize",
+              "GroupMaxSize"
+            ]
+          }
+        ]
+      }
+    },
+    "sgPreELBGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable SSH access and HTTP access on the inbound port",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": {
+              "Ref": "SSHServerPort"
+            },
+            "ToPort": {
+              "Ref": "SSHServerPort"
+            },
+            "CidrIp": {
+              "Ref": "SSHLocation"
+            }
+          }
+        ]
+      }
+    },
+    "sgPreELBIngress": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Fn::GetAtt": [
+            "sgPreELBGroup",
+            "GroupId"
+          ]
+        },
+        "IpProtocol": "icmp",
+        "FromPort": "-1",
+        "ToPort": "-1",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "sgPreELBGroup",
+            "GroupId"
+          ]
+        }
+      },
+      "DependsOn": "sgPreELBGroup"
+    },
+    "HAProxyRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "ec2.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "handle-nat",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": "ec2:AuthorizeSecurityGroupIngress",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "ec2:DescribeSecurityGroups",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "ec2:RevokeSecurityGroupIngress",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "ec2:AssociateAddress",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "ec2:DescribeAddresses",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "elasticloadbalancing:DescribeInstanceHealth",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "elasticloadbalancing:DescribeLoadBalancers",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "s3:*",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": "sts:AssumeRole",
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "cloudformation:CreateUploadBucket",
+                    "cloudformation:DescribeStackEvents",
+                    "cloudformation:DescribeStackResource",
+                    "cloudformation:DescribeStackResources",
+                    "cloudformation:GetTemplateSummary",
+                    "cloudformation:ListStackResources",
+                    "cloudformation:SignalResource"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "HAProxyProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [
+          {
+            "Ref": "HAProxyRole"
+          }
+        ]
+      }
+    },
+    "WHasgSFTP": {
+      "Type": "AWS::CloudFormation::WaitConditionHandle"
+    },
+    "WCasgSFTP": {
+      "Type": "AWS::CloudFormation::WaitCondition",
+      "DependsOn": "lcAsgSFTP",
+      "Properties": {
+        "Handle": {
+          "Ref": "WHasgSFTP"
+        },
+        "Timeout": "2000"
+      }
+    }
+  },
+  "Outputs": {
+    "SecurityGroup": {
+      "Description": "SecurityGroup ID of the NAT system",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Fn::GetAtt": [
+                "sgPreELBGroup",
+                "GroupId"
+              ]
+            }
+          ]
+        ]
+      }
+    }
+  }
+}

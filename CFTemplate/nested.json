@@ -155,7 +155,7 @@
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "Tags": [],
-        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/standalone-ec2Mgmt.json",
+        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/asgMgmt.json",
         "TimeoutInMinutes": "15",
         "Parameters": {
           "MgmtDestTarget": {
@@ -199,7 +199,7 @@
       "Condition": "CreateStackSFTP",
       "Properties": {
         "Tags": [],
-        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/standalone-ec2SFTP.json",
+        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/asgSFTP.json",
         "TimeoutInMinutes": "15",
         "Parameters": {
           "SFTPDestTarget": {
