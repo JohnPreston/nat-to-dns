@@ -1,0 +1,51 @@
+---
+# Set the new EIP configuration
+
+- name: Update the EIP global list with ec2Mgmt
+  set_fact: ec2_eips="{{ ec2_eips | union(ec2Mgmt_eip.stdout_lines) }}"
+
+- name: Update the EIP global list with ec2SFTP
+  set_fact: ec2_eips="{{ ec2_eips | union(ec2SFTP_eip.stdout_lines) }}"
+  when:
+  - "{{ ec2SFTP_eip|success }}"
+
+- name: Update the EIP global list with asgJLB EIP 0
+  set_fact: ec2_eips="{{ ec2_eips | union(asgJLB_eip0.stdout_lines) }}"
+  when:
+  - "{{ asgJLB_eip1|success }}"
+
+- name: Update the EIP global list with asgJLB EIP 1
+  set_fact: ec2_eips="{{ ec2_eips | union(asgJLB_eip1.stdout_lines) }}"
+  when:
+  - "{{ asgJLB_eip1|success }}"
+
+- name: Debug
+  debug: msg="{{ ec2_eips }}"
+  when:
+  - debug
+
+- name: Create the new EIP Global config file
+  template: src=eip-global-new.conf.j2 dest=/var/tmp/eips-global.conf
+
+- name: Upload the nat2dns config files with timestamps
+  s3: bucket="{{ nat2dns_bucket }}"
+      object="{{ ansible_date_time.date }}-{{ ansible_date_time.tz }}/{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}/{{ item.split('/') | last }}"
+      src="{{ item }}"
+      mode=put s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
+  with_items:
+  - "/var/tmp/eips-global.conf"
+  tags:
+  - config
+  - global
+
+- name: Upload the nat2dns config file
+  s3: bucket="{{ nat2dns_bucket }}"
+      object="{{ item.split('/') | last }}"
+      src="{{ item }}"
+      mode=put
+      s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
+  with_items:
+  - "/var/tmp/eips-global.conf"
+  tags:
+  - config
+  - global
