@@ -4,6 +4,10 @@
 #  - NAT2DNS-handler
   roles:
   - create-stack
+  environment:
+  - AWS_ACCESS_KEY: "{{ aws_access_key }}"
+  - AWS_SECRET_KEY: "{{ aws_secret_key }}"
+  - AWS_CREDENTIAL_FILE: /var/tmp/awsrc
   vars_files:
   - vars/params.yml
   - vars/options_params.yml

@@ -29,7 +29,7 @@
 
 - name: Upload the nat2dns config files with timestamps
   s3: bucket="{{ nat2dns_bucket }}"
-      object="{{ ansible_date_time.date }}-{{ ansible_date_time.tz }}/{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}/{{ item.split('/') | last }}"
+      object="{{ ansible_date_time.year }}/{{ ansible_date_time.month}}/{{ ansible_date_time.day }}/{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}{/{{ ansible_date_time.tz }}-{{ item.split('/') | last }}"
       src="{{ item }}"
       mode=put s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
   with_items:

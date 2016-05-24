@@ -2,6 +2,9 @@
 # Play to deploy a new NAT Stack
 # Remove the ec2Mgmt dependency building all artifacts prior to the CF kick off
 
+- name: Template credentials files
+  template: src=aws_creds.j2 dest=/var/tmp/awsrc
+
 - name: FOOL PROOF
   include: checklist.yml
 
