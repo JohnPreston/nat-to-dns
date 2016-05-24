@@ -1,0 +1,28 @@
+---
+# FOOL PROOF
+
+- name: Checks that the NAT2DNS doesnt already exists
+  shell: aws cloudformation describe-stacks --stack-name "{{ stack_name }}"
+         --region eucalyptus
+         --output=json
+         --endpoint-url="http://cloudformation.{{ region_dns }}:8773/"
+  tags:
+  - cloudformation
+  - fool_proof
+  register: stacks_list
+
+- name: Set stacks list
+  set_fact: stacks="{{ stacks_list.stdout|from_json }}"
+
+- name: Debug stacks length
+  debug: msg="{{ stacks.Stacks|length }}"
+  when:
+  - debug
+
+- name: Stop here for now
+  fail: msg="FAILED - There is already a stack with the name {{ stack_name }}"
+  when:
+  - "{{ stacks.Stacks|length > 0 }}"
+  tags:
+  - fool_proof
+  - failed

@@ -1,0 +1,59 @@
+---
+# Parse stack EIPs
+
+- name: Get the stack configuration
+  s3: bucket="{{ stack_name }}"
+      object="{{ item }}-eips.conf"
+      dest="/var/tmp/{{ item }}"
+      mode=get
+      s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
+  with_items:
+  - "{{ stack_name }}"
+  tags:
+  - new
+
+- name: Parse ec2Mgmt EIP
+  shell: echo "{{ lookup('ini', 'eip section=ec2Mgmt file=/var/tmp/{{ stack_name }}-eips.conf') }}"
+  register: ec2Mgmt_eip
+
+- name: Parse ec2SFTP EIP
+  shell: echo "{{ lookup('ini', 'eip section=ec2SFTP file=/var/tmp/{{ stack_name }}-eips.conf') }}"
+  register: ec2SFTP_eip
+  ignore_errors: True
+
+
+- name: Parse asgJLB EIP 0
+  shell: echo "{{ lookup('ini', 'eip0 section=asgJLB file=/var/tmp/{{ stack_name }}-eips.conf') }}"
+  register: asgJLB_eip0
+  ignore_errors: True
+
+- name: Parse asgJLB EIP 1
+  shell: echo "{{ lookup('ini', 'eip1 section=asgJLB file=/var/tmp/{{ stack_name }}-eips.conf') }}"
+  register: asgJLB_eip1
+  ignore_errors: True
+
+- name: Debug ec2Mgmt EIP
+  debug: msg="{{ ec2Mgmt_eip.stdout }}"
+  when:
+  - debug
+
+- name: Debug ec2SFTP
+  debug: msg="{{ ec2SFTP_eip.stdout }}"
+  when:
+  - "{{ ec2SFTP_eip|success }}"
+  - debug
+  ignore_errors: True
+
+- name: Debug asgJLB EIP 0
+  debug: msg="{{ asgJLB_eip0.stdout }}"
+  when:
+  - "{{ asgJLB_eip0|success }}"
+  - debug
+  ignore_errors: True
+
+- name: Debug asgJLB EIP 1
+  debug: msg="{{ asgJLB_eip1.stdout }}"
+  when:
+  - "{{ asgJLB_eip1|success }}"
+  - debug
+  ignore_errors: True

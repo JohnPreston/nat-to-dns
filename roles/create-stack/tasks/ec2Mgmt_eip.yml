@@ -2,6 +2,11 @@
 # Get the addresses to use
 #
 
+- name: FAILED - Not enough EIPs available for that resource
+  fail: msg="FAILED - Not enough EIPs available"
+  when:
+  - "{{ ec2_eips | length < 1 }}"
+
 - name: Random select an EIP
   shell: echo {{item }}
   with_items:

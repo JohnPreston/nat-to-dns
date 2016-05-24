@@ -1,0 +1,31 @@
+---
+# Init configuration steps for the EIPs
+
+- name: Get the global EIP configuration file
+  s3: bucket="{{ nat2dns_bucket }}" object="{{ item }}" dest="/var/tmp/{{ item }}"
+      mode=get s3_url="{{ api_protocol }}s3.{{ region_dns }}:{{ api_port }}"
+  with_items:
+  - "eips-global.conf"
+  tags:
+  - new
+
+- name: Parse all available EIPs
+  shell: grep -v booked /var/tmp/eips-global.conf
+  register: eips
+  tags:
+  - new
+
+- name: Set ec2_eips list
+  set_fact: ec2_eips="{{ eips.stdout_lines }}"
+  tags:
+  - new
+
+- name: Debug ec2_eips
+  debug: msg="{{ ec2_eips }}"
+  when:
+  - debug
+
+- name: FAILED - Not enough EIPs available
+  fail: msg="FAILED - Not enough EIPs available"
+  when:
+  - "{{ eips.stdout_lines | length < 1 }}"

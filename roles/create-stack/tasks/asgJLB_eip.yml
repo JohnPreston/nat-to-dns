@@ -7,6 +7,36 @@
   when:
   - debug
 
+- name: FAILED - Not enough EIPs available for that resource
+  fail: msg="FAILED - Not enough EIPs available"
+  when:
+  - "{{ ec2_eips | length < 2 }}"
+
+- name: Random select EIP0
+  shell: echo {{item }}
+  with_items:
+    - "{{ ec2_eips | random }}"
+  register: asgJLB_eip0
+  tags:
+  - s3
+  - ec2
+  - eip
+
+- name: Remove ec2Mgmt EIP0 from ec2_eips
+  set_fact: ec2_eips="{{ ec2_eips | symmetric_difference(asgJLB_eip0.results[0].stdout_lines) }}"
+
+- name: Random select EIP1
+  shell: echo {{item }}
+  with_items:
+    - "{{ ec2_eips | random }}"
+  register: asgJLB_eip1
+  tags:
+  - s3
+  - ec2
+  - eip
+  when:
+  - "{{ ec2_eips|length  >= 1 }}"
+
 - name: Create the asgJLB config file
   template: src=asgJLB.conf.j2 dest=/var/tmp/asgJLB.conf
 
@@ -18,3 +48,8 @@
   with_items:
   - "/var/tmp/asgJLB.conf"
   - "/var/tmp/asgJLB-target.conf"
+
+- name: Remove ec2Mgmt EIP1 from ec2_eips
+  set_fact: ec2_eips="{{ ec2_eips | symmetric_difference(asgJLB_eip1.results[0].stdout_lines) }}"
+  when:
+  - "{{ ec2_eips|length  >= 1 }}"

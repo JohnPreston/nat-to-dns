@@ -1,6 +1,7 @@
 ---
 # Parameters always valid for the cloud
 
+nat2dns_bucket: "nat2dns"
 
 cloud_params:
 - ParameterKey: ImageId
@@ -13,7 +14,3 @@ cloud_params:
   ParameterValue: "{{ api_protocol }}"
 - ParameterKey: APIPort
   ParameterValue: "{{ api_port }}"
-- ParameterKey: HasSFTP
-  ParameterValue: "{{ has_sftp|string }}"
-- ParameterKey: HasELB
-  ParameterValue: "{{ has_elb|string }}"

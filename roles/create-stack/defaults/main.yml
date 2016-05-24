@@ -1,2 +1,5 @@
 
 debug: false
+api_protocol:
+api_port:
+region_dns:

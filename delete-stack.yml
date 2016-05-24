@@ -2,10 +2,10 @@
 - hosts:
   - localhost
   roles:
-  - create-stack
+  - delete-stack
   vars_files:
   - vars/params.yml
+  - vars/options_params.yml
   - vars/cloud_params.yml
   vars:
-  - has_sftp: false
-  - has_elb: false
+  - stack_name: "{{ stack_name }}"
