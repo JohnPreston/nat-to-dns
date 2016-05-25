@@ -177,7 +177,7 @@
               {
                 "Ref": "APIPort"
               },
-              "/",
+              ":/",
               {
                 "Ref": "TemplatesBucket"
               },
