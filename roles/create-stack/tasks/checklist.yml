@@ -26,3 +26,17 @@
   tags:
   - fool_proof
   - failed
+
+- name: List all buckets
+  shell: s3cmd -c /var/tmp/s3cfg ls | awk '{print $3}' | awk -F/ '{print $3}'
+  register: s3cmd_out
+
+- name: Debug buckets
+  debug: msg="{{ s3cmd_out }}"
+  when:
+  - debug
+
+- name: Fail if bucket already exists
+  fail: msg="FAILED - There is already a bucket of the name {{ stack_name }}"
+  when:
+  - "{{ stack_name in s3cmd_out.stdout_lines }}"

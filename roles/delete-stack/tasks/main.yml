@@ -1,6 +1,9 @@
 ---
 # Delete the NAT2DNS stack
 
+- name: Template the s3cfg file
+  template: src=s3cfg.conf.j2 dest=/var/tmp/s3cfg
+
 - name: Fool proof
   include: checklist.yml
 
@@ -12,6 +15,9 @@
 
 - name: Set the new EIP configuration
   include: set_eips.yml
+
+- name: Delete the old bucket
+  shell: s3cmd -c /var/tmp/s3cfg rb -r "s3://{{ stack_name }}"
 
 - name: Delete the stack
   shell: aws cloudformation delete-stack

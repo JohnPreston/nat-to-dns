@@ -5,6 +5,9 @@
 - name: Template credentials files
   template: src=aws_creds.j2 dest=/var/tmp/awsrc
 
+- name: Template the s3cfg file
+  template: src=s3cfg.conf.j2 dest=/var/tmp/s3cfg
+
 - name: FOOL PROOF
   include: checklist.yml
 
