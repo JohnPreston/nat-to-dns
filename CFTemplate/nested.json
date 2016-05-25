@@ -107,6 +107,14 @@
       "AllowedPattern": "emi-[\\x20-\\x7E]*",
       "ConstraintDescription": "can contain only ASCII characters."
     },
+    "TemplatesBucket": {
+      "Description": "Name of bucket storing the templates",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "255",
+      "ConstraintDescription": "can contain only ASCII characters.",
+      "Default": "templates"
+    },
     "BucketName": {
       "Description": "Name of the bucket name to be used",
       "Type": "String",
@@ -155,7 +163,29 @@
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "Tags": [],
-        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/asgMgmt.json",
+        "TemplateURL": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "APIProtocol"
+              },
+              "s3.",
+              {
+                "Ref": "RegionDNS"
+              },
+              {
+                "Ref": "APIPort"
+              },
+              "/",
+              {
+                "Ref": "TemplatesBucket"
+              },
+              "/",
+              "asgMgmt.json"
+            ]
+          ]
+        },
         "TimeoutInMinutes": "15",
         "Parameters": {
           "MgmtDestTarget": {
