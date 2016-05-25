@@ -1,3 +1,18 @@
+---
+# Delete a NAT2DNS stack
+
+- hosts:
+  - localhost
+  tasks:
+  - name: Set AWS ACCESS KEY
+    set_fact: aws_access_key="{{ ansible_env.AWS_ACCESS_KEY }}"
+    when:
+    - "{{ 'AWS_ACCESS_KEY' in ansible_env }}"
+
+  - name: Set AWS SECRET KEY
+    set_fact: aws_secret_key="{{ ansible_env.AWS_SECRET_KEY }}"
+    when:
+    - "{{ 'AWS_SECRET_KEY' in ansible_env }}"
 
 - hosts:
   - localhost
