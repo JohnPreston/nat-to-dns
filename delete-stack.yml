@@ -18,6 +18,8 @@
   - localhost
   roles:
   - delete-stack
+  environment:
+  - AWS_CREDENTIAL_FILE: /var/tmp/awsrc
   vars_files:
   - vars/params.yml
   - vars/options_params.yml
