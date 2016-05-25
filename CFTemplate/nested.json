@@ -174,10 +174,11 @@
               {
                 "Ref": "RegionDNS"
               },
+              ":",
               {
                 "Ref": "APIPort"
               },
-              ":/",
+              "/",
               {
                 "Ref": "TemplatesBucket"
               },
@@ -229,7 +230,30 @@
       "Condition": "CreateStackSFTP",
       "Properties": {
         "Tags": [],
-        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/asgSFTP.json",
+        "TemplateURL": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "APIProtocol"
+              },
+              "s3.",
+              {
+                "Ref": "RegionDNS"
+              },
+              ":",
+              {
+                "Ref": "APIPort"
+              },
+              "/",
+              {
+                "Ref": "TemplatesBucket"
+              },
+              "/",
+              "asgSFTP.json"
+            ]
+          ]
+        },
         "TimeoutInMinutes": "15",
         "Parameters": {
           "SFTPDestTarget": {
@@ -273,7 +297,30 @@
       "Condition": "CreateStackELB",
       "Properties": {
         "Tags": [],
-        "TemplateURL": "http://objectstorage.cloud.emea.eucalyptus.com:8773/templates/asgJLB.json",
+        "TemplateURL": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "APIProtocol"
+              },
+              "s3.",
+              {
+                "Ref": "RegionDNS"
+              },
+              ":",
+              {
+                "Ref": "APIPort"
+              },
+              "/",
+              {
+                "Ref": "TemplatesBucket"
+              },
+              "/",
+              "asgJLB.json"
+            ]
+          ]
+        },
         "TimeoutInMinutes": "15",
         "Parameters": {
           "ELBDestTarget": {
