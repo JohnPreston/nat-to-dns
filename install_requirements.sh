@@ -21,3 +21,5 @@ git clone https://github.com/eucalyptus/s3cmd /var/tmp/s3cmd
 cd /var/tmp/s3cmd
 sudo python setup.py install
 cd
+
+git clone https://github.com/johnpreston/nat-to-dns
