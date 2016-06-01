@@ -1,0 +1,13 @@
+---
+# Create stack
+
+- name: Create the CF parameters
+  template: src=cf_parameters.json.j2 dest=/var/tmp/cf_parameters.json
+- name: Create the CF NAT2DNS Stack
+  shell: aws cloudformation create-stack --stack-name "{{ stack_name }}"
+         --template-url "{{ template_url }}"
+         --capabilities CAPABILITY_IAM
+         --disable-rollback
+         --parameters file:///var/tmp/cf_parameters.json
+         --region eucalyptus
+         --endpoint-url="http://cloudformation.{{ region_dns }}:8773/"
