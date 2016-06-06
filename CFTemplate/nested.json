@@ -7,21 +7,21 @@
       "Type": "String",
       "MinLength": "8",
       "MaxLength": "1024",
-      "AllowedPattern": "([0-9]+):(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
+      "AllowedPattern": "([0-9]+):(([0-9a-zA-Z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
     },
     "SFTPDestTarget": {
       "Description": "The DNS Name of the target to monitor",
       "Type": "String",
       "MinLength": "8",
       "MaxLength": "256",
-      "AllowedPattern": "([0-9]+):(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
+      "AllowedPattern": "([0-9]+):(([0-9a-zA-Z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
     },
     "ELBDestTarget": {
       "Description": "The DNS Name of the target to monitor",
       "Type": "String",
       "MinLength": "8",
       "MaxLength": "256",
-      "AllowedPattern": "([0-9]+):(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
+      "AllowedPattern": "([0-9]+):(([0-9a-zA-Z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?)):(([0-9]+))"
     },
     "HasSFTP": {
       "Description": "Defines if stackSFTP should be created",
@@ -128,7 +128,7 @@
       "Type": "String",
       "MinLength": "8",
       "MaxLength": "256",
-      "AllowedPattern": "(([0-9a-z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?))"
+      "AllowedPattern": "(([0-9a-zA-Z_-]+\\.)+(aero|asia|biz|com|coop|edu|gov|info|net|org|au|be|bz|ca|ch|ci|ck|cl|cm|cn|co|cz|de|es|eu|fr|in|io|uk|us)(:[0-9]+)?((([~0-9a-zA-Z_-]+))?))"
     },
     "NTPServer": {
       "Description": "The IP address to sync NTP on the first run",
