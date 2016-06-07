@@ -50,7 +50,7 @@ This file is pretty to create at start:
 ```
 
 s3cmd mb s3://nat2dns
-euca-describe-addresses | grep -v \-i | awk '{print $2}' > eips-global.conf
+euca-describe-addresses | grep -v i\- | awk '{print $2}' > eips-global.conf
 s3cmd put eips-global.conf s3://nat2dns
 
 ```
