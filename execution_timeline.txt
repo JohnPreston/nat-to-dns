@@ -1,0 +1,50 @@
+- name: Checks that the NAT2DNS doesnt already exists
+- name: Set stacks list
+- name: Debug stacks length
+- name: Fail if Stack already exist
+
+- name: List all buckets
+- name: Debug buckets
+- name: Fail if bucket already exists
+
+- name: Get the global EIP configuration file
+- name: Parse all available EIPs
+- name: Set ec2_eips list
+- name: Debug ec2_eips
+- name: FAILED - Not enough EIPs
+- name: Create the S3 bucket
+
+- name: FAILED - Not enough EIPs available for ec2Mgmt
+- name: Random select an EIP
+- name: Debug ec2Mgmt EIP
+- name: Create the Mgmt EIP config file
+- name: Create the Mgmt target config file
+- name: Push files to the bucket
+- name: Remove ec2Mgmt EIP from ec2_eips
+- name: Debug ec2_eips
+
+- name: FAILED - Not enough EIPs available for ec2SFTP
+- name: Random select an EIP
+- name: Create the SFTP config file
+- name: Create the SFTP target config file
+- name: Push files to the bucket
+- name: Remove ec2SFTP EIP from ec2_eips
+- name: Debug the EIPs
+
+- name: FAILED - Not enough EIPs available for JLB
+- name: Random select EIP0
+- name: Remove ec2Mgmt EIP0 from ec2_eips
+- name: Random select EIP1
+- name: Create the asgJLB config file
+- name: Create the asgJLB config file
+- name: Push files to the bucket
+- name: Remove ec2Mgmt EIP1 from ec2_eips
+
+- name: Create the CF parameters
+- name: Create the CF NAT2DNS Stack
+
+- name: Create the new eips-global.conf file
+- name: Create the stack EIP configuration
+- name: Upload the nat2dns config files with timestamps
+- name: Upload the nat2dns config files timestamps
+- name: Upload the stack config in stack bucket
